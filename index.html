@@ -296,7 +296,82 @@
             if (checkWinner()) return;
             turn = "X";
         }
+    } function botMove() {
+    if (gameOver) return;
+    const cells = document.querySelectorAll(".cell");
+
+    // Minimax AI ka best move nikalna
+    let bestScore = -Infinity;
+    let move;
+    cells.forEach((cell, index) => {
+        if (cell.textContent === "") {
+            cell.textContent = "O";
+            let score = minimax(cells, 0, false);
+            cell.textContent = "";
+            if (score > bestScore) {
+                bestScore = score;
+                move = index;
+            }
+        }
+    });
+
+    // Best move lagana
+    if (move !== undefined) {
+        cells[move].textContent = "O";
+        oCells.push(cells[move]);
+        if (oCells.length > 3) {
+            let removed = oCells.shift();
+            removed.textContent = "";
+        }
+        if (checkWinner()) return;
+        turn = "X";
     }
+}
+
+function minimax(cells, depth, isMaximizing) {
+    if (checkTerminal(cells) !== null) {
+        return checkTerminal(cells);
+    }
+
+    if (isMaximizing) {
+        let bestScore = -Infinity;
+        cells.forEach((cell, index) => {
+            if (cell.textContent === "") {
+                cell.textContent = "O";
+                let score = minimax(cells, depth + 1, false);
+                cell.textContent = "";
+                bestScore = Math.max(score, bestScore);
+            }
+        });
+        return bestScore;
+    } else {
+        let bestScore = Infinity;
+        cells.forEach((cell, index) => {
+            if (cell.textContent === "") {
+                cell.textContent = "X";
+                let score = minimax(cells, depth + 1, true);
+                cell.textContent = "";
+                bestScore = Math.min(score, bestScore);
+            }
+        });
+        return bestScore;
+    }
+}
+
+function checkTerminal(cells) {
+    for (let pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (cells[a].textContent &&
+            cells[a].textContent === cells[b].textContent &&
+            cells[a].textContent === cells[c].textContent) {
+            return cells[a].textContent === "O" ? 10 : -10;
+        }
+    }
+    if ([...cells].every(c => c.textContent !== "")) {
+        return 0;
+    }
+    return null;
+                  }
 
     function findBestMove(player) {
         const cells = document.querySelectorAll(".cell");
