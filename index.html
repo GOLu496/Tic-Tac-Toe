@@ -149,7 +149,7 @@
     <div class="game-container">
         <h1>Tic Tac Toe</h1>
         <a href="https://youtube.com/@golutheghost-4444?si=3ny96yTFbFjFtwx4" target="_blank">GOLu the GhosT</a>
-        
+
         <div class="big-square">
             <!-- Game Board -->
             <div class="board" id="board">
@@ -270,23 +270,26 @@
         document.querySelectorAll(".win-line").forEach(line => line.remove());
     }
 
+    // Updated Perfect AI Bot
     function botMove() {
         if (gameOver) return;
         const cells = document.querySelectorAll(".cell");
 
-        let move = findBestMove("O");
-        if (move === null) move = findBestMove("X");
-        if (move === null && cells[4].textContent === "") move = 4;
-        if (move === null) {
-            let corners = [0, 2, 6, 8].filter(i => cells[i].textContent === "");
-            if (corners.length > 0) move = corners[Math.floor(Math.random() * corners.length)];
-        }
-        if (move === null) {
-            let emptyCells = [...cells].map((c, i) => c.textContent === "" ? i : null).filter(v => v !== null);
-            if (emptyCells.length > 0) move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        }
+        let bestScore = -Infinity;
+        let move;
+        cells.forEach((cell, index) => {
+            if (cell.textContent === "") {
+                cell.textContent = "O";
+                let score = minimax(cells, 0, false);
+                cell.textContent = "";
+                if (score > bestScore) {
+                    bestScore = score;
+                    move = index;
+                }
+            }
+        });
 
-        if (move !== null) {
+        if (move !== undefined) {
             cells[move].textContent = "O";
             oCells.push(cells[move]);
             if (oCells.length > 3) {
@@ -296,82 +299,51 @@
             if (checkWinner()) return;
             turn = "X";
         }
-    } function botMove() {
-    if (gameOver) return;
-    const cells = document.querySelectorAll(".cell");
-
-    // Minimax AI ka best move nikalna
-    let bestScore = -Infinity;
-    let move;
-    cells.forEach((cell, index) => {
-        if (cell.textContent === "") {
-            cell.textContent = "O";
-            let score = minimax(cells, 0, false);
-            cell.textContent = "";
-            if (score > bestScore) {
-                bestScore = score;
-                move = index;
-            }
-        }
-    });
-
-    // Best move lagana
-    if (move !== undefined) {
-        cells[move].textContent = "O";
-        oCells.push(cells[move]);
-        if (oCells.length > 3) {
-            let removed = oCells.shift();
-            removed.textContent = "";
-        }
-        if (checkWinner()) return;
-        turn = "X";
-    }
-}
-
-function minimax(cells, depth, isMaximizing) {
-    if (checkTerminal(cells) !== null) {
-        return checkTerminal(cells);
     }
 
-    if (isMaximizing) {
-        let bestScore = -Infinity;
-        cells.forEach((cell, index) => {
-            if (cell.textContent === "") {
-                cell.textContent = "O";
-                let score = minimax(cells, depth + 1, false);
-                cell.textContent = "";
-                bestScore = Math.max(score, bestScore);
-            }
-        });
-        return bestScore;
-    } else {
-        let bestScore = Infinity;
-        cells.forEach((cell, index) => {
-            if (cell.textContent === "") {
-                cell.textContent = "X";
-                let score = minimax(cells, depth + 1, true);
-                cell.textContent = "";
-                bestScore = Math.min(score, bestScore);
-            }
-        });
-        return bestScore;
-    }
-}
+    function minimax(cells, depth, isMaximizing) {
+        let result = checkTerminal(cells);
+        if (result !== null) return result - depth;
 
-function checkTerminal(cells) {
-    for (let pattern of winPatterns) {
-        const [a, b, c] = pattern;
-        if (cells[a].textContent &&
-            cells[a].textContent === cells[b].textContent &&
-            cells[a].textContent === cells[c].textContent) {
-            return cells[a].textContent === "O" ? 10 : -10;
+        if (isMaximizing) {
+            let bestScore = -Infinity;
+            cells.forEach((cell, index) => {
+                if (cell.textContent === "") {
+                    cell.textContent = "O";
+                    let score = minimax(cells, depth + 1, false);
+                    cell.textContent = "";
+                    bestScore = Math.max(score, bestScore);
+                }
+            });
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            cells.forEach((cell, index) => {
+                if (cell.textContent === "") {
+                    cell.textContent = "X";
+                    let score = minimax(cells, depth + 1, true);
+                    cell.textContent = "";
+                    bestScore = Math.min(score, bestScore);
+                }
+            });
+            return bestScore;
         }
     }
-    if ([...cells].every(c => c.textContent !== "")) {
-        return 0;
+
+    function checkTerminal(cells) {
+        for (let pattern of winPatterns) {
+            const [a, b, c] = pattern;
+            if (cells[a].textContent &&
+                cells[a].textContent === cells[b].textContent &&
+                cells[a].textContent === cells[c].textContent) {
+                return cells[a].textContent === "O" ? 10 : -10;
+            }
+        }
+        if ([...cells].every(c => c.textContent !== "")) {
+            return 0;
+        }
+        return null;
     }
-    return null;
-                  }
 
     function findBestMove(player) {
         const cells = document.querySelectorAll(".cell");
