@@ -75,7 +75,7 @@
         visibility: hidden;
     }
     .cell {
-        background: #666;
+        background: #999;
         border-radius: 10px;
         aspect-ratio: 1 / 1;
         font-size: 2.5em;
@@ -92,19 +92,58 @@
     }
     .menu button {
         display: block;
-        width: 150px;
-        margin: 10px auto;
+        height:220px;
+        width: 450px;
+        margin: 15px auto;
         padding: 10px;
-        font-size: 16px;
+        font-size: 30px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
     }
-    .menu .mode {
-        background: #ff9800;
-        color: white;
-    }
-    .winner-screen {
+    /* Common style for both buttons */
+.menu .mode {
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s ease;
+}
+    /* 2 Players button */
+.menu .mode-2p {
+    background: 
+        url("https://drive.google.com/file/d/10t9yrsOAaI1KSzR5odzT08RP3DQ7T3aB/view?usp=drivesdk") center/cover no-repeat,
+        #ff9800; /* fallback color */
+    color: white;
+    width: 450px;
+    height: 220px;
+    font-size: 30px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+.menu .mode-2p:hover {
+    background-color: #ffb74d; /* only affects fallback */
+}
+
+/* Bot button */
+.menu .mode-bot {
+    background: 
+        url("https://drive.google.com/file/d/10pJ5RZqfpaLBpbK") center/cover no-repeat,
+        #2196f3; /* fallback color */
+    color: white;
+    width: 450px;
+    height: 220px;
+    font-size: 30px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+.menu .mode-bot:hover {
+    background-color: #64b5f6; /* only affects fallback */
+}
+    
+  .winner-screen {
         text-align: center;
         display: none;
     }
@@ -166,8 +205,8 @@
 
             <!-- Menu -->
             <div class="menu" id="menu">
-                <button class="mode" onclick="setMode('2p')">2 Players</button>
-                <button class="mode" onclick="setMode('bot')">Bot</button>
+                <button class="mode mode-2p" onclick="setMode('2p')">2 Players</button>
+                <button class="mode mode-bot" onclick="setMode('bot')">Bot</button>
             </div>
 
             <!-- Winner Screen -->
