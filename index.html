@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9074803850365464"
-     crossorigin="anonymous"></script>
 <meta charset="UTF-8">
 <title>Tic Tac Toe Layout</title>
 <style>
@@ -59,7 +57,7 @@
     .big-square {
         background: white;
         border-radius: 15px;
-        width: 90%;
+        width: 99%;
         aspect-ratio: 1 / 1;
         display: flex;
         justify-content: center;
@@ -92,66 +90,25 @@
     .menu {
         text-align: center;
     }
-    .menu button {
+    /* Menu buttons responsive */
+    .menu .mode {
         display: block;
-        height:220px;
-        width: 450px;
         margin: 15px auto;
-        padding: 10px;
-        font-size: 30px;
-        border: none;
-        border-radius: 8px;
+        font-size: 2em;
+        border-radius: 10px;
         cursor: pointer;
+        border: none;
+        transition: 0.3s ease;
+        width: 70vw;
+        height: 20vh;
     }
-    /* Common style for both buttons */
-.menu .mode {
-    font-size: 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    border: none;
-    transition: 0.3s ease;
-}
-    /* 2 Players button */
-.menu .mode-2p {
-    background: #64b5f6;
-    color: white;
-    width: 450px;
-    height: 220px;
-    font-size: 30px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
-.menu .mode-2p:hover {
-    background-color: #ffb74d; /* only affects fallback */
-}
+    .menu .mode-2p { background: #64b5f6; color: white; }
+    .menu .mode-2p:hover { background-color: #ffb74d; }
+    .menu .mode-bot { background: #2196f3; color: white; }
+    .menu .mode-bot:hover { background-color: #64b5f6; }
 
-/* Bot button */
-.menu .mode-bot {
-    background: 
-        url("https://drive.google.com/file/d/10pJ5RZqfpaLBpbK") center/cover no-repeat,
-        #2196f3; /* fallback color */
-    color: white;
-    width: 450px;
-    height: 220px;
-    font-size: 30px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
-.menu .mode-bot:hover {
-    background-color: #64b5f6; /* only affects fallback */
-}
-    
-  .winner-screen {
-        text-align: center;
-        display: none;
-    }
-    .winner-screen h2 {
-        color: black;
-        font-size: 28px;
-        margin-bottom: 15px;
-    }
+    .winner-screen { text-align: center; display: none; }
+    .winner-screen h2 { color: black; font-size: 28px; margin-bottom: 15px; }
     .winner-screen button {
         background: #4caf50;
         color: white;
@@ -190,7 +147,6 @@
         <a href="https://youtube.com/@golutheghost-4444?si=3ny96yTFbFjFtwx4" target="_blank">GOLu the GhosT</a>
 
         <div class="big-square">
-            <!-- Game Board -->
             <div class="board" id="board">
                 <div class="cell" data-index="0"></div>
                 <div class="cell" data-index="1"></div>
@@ -203,227 +159,192 @@
                 <div class="cell" data-index="8"></div>
             </div>
 
-            <!-- Menu -->
             <div class="menu" id="menu">
                 <button class="mode mode-2p" onclick="setMode('2p')">2 Players</button>
                 <button class="mode mode-bot" onclick="setMode('bot')">Bot</button>
             </div>
 
-            <!-- Winner Screen -->
             <div class="winner-screen" id="winnerScreen">
                 <h2 id="winnerText"></h2>
                 <button onclick="restartGame()">Restart</button>
             </div>
         </div>
 
-        <!-- Back to Home Button -->
         <button id="backHome" onclick="goHome()">Back to Home</button>
     </div>
 </div>
 <div class="side"></div>
 
 <script>
-    let gameMode = null;
-    let turn = "X"; 
-    let xCells = [];
-    let oCells = [];
-    let gameOver = false;
+let gameMode = null;
+let turn = "X"; 
+let xCells = [];
+let oCells = [];
+let gameOver = false;
 
-    const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
-    ];
+const winPatterns = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+];
 
-    function setMode(mode) {
-        gameMode = mode;
-        document.getElementById("menu").style.display = "none"; 
-        document.getElementById("board").style.visibility = "visible"; 
-        document.getElementById("backHome").style.display = "inline-block";
-    }
+function setMode(mode){
+    gameMode = mode;
+    document.getElementById("menu").style.display="none";
+    document.getElementById("board").style.visibility="visible";
+    document.getElementById("backHome").style.display="inline-block";
+}
 
-    function checkWinner() {
-        const cells = document.querySelectorAll(".cell");
-        for (let pattern of winPatterns) {
-            const [a, b, c] = pattern;
-            if (cells[a].textContent &&
-                cells[a].textContent === cells[b].textContent &&
-                cells[a].textContent === cells[c].textContent) {
-
-                drawWinningLine(pattern);
-                setTimeout(() => showWinner(cells[a].textContent), 1000);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function drawWinningLine(pattern) {
-        const board = document.getElementById("board");
-        const cells = document.querySelectorAll(".cell");
-
-        const rectA = cells[pattern[0]].getBoundingClientRect();
-        const rectC = cells[pattern[2]].getBoundingClientRect();
-        const boardRect = board.getBoundingClientRect();
-
-        const x1 = rectA.left + rectA.width / 2 - boardRect.left;
-        const y1 = rectA.top + rectA.height / 2 - boardRect.top;
-        const x2 = rectC.left + rectC.width / 2 - boardRect.left;
-        const y2 = rectC.top + rectC.height / 2 - boardRect.top;
-
-        const line = document.createElement("div");
-        line.classList.add("win-line");
-        line.style.width = Math.hypot(x2 - x1, y2 - y1) + "px";
-        line.style.transform = `translate(${x1}px, ${y1}px) rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)`;
-
-        board.appendChild(line);
-    }
-
-    function showWinner(symbol) {
-        gameOver = true;
-        document.getElementById("board").style.visibility = "hidden";
-        document.getElementById("winnerText").textContent = `Winner: ${symbol}`;
-        document.getElementById("winnerScreen").style.display = "block";
-        document.getElementById("backHome").style.display = "none";
-    }
-
-    function restartGame() {
-        clearBoard();
-        document.getElementById("winnerScreen").style.display = "none";
-        document.getElementById("menu").style.display = "block";
-    }
-
-    function goHome() {
-        clearBoard();
-        document.getElementById("menu").style.display = "block";
-        document.getElementById("board").style.visibility = "hidden";
-        document.getElementById("backHome").style.display = "none";
-    }
-
-    function clearBoard() {
-        document.querySelectorAll(".cell").forEach(c => c.textContent = "");
-        xCells = [];
-        oCells = [];
-        turn = "X";
-        gameOver = false;
-        document.querySelectorAll(".win-line").forEach(line => line.remove());
-    }
-
-    // Updated Perfect AI Bot
-    function botMove() {
-        if (gameOver) return;
-        const cells = document.querySelectorAll(".cell");
-
-        let bestScore = -Infinity;
-        let move;
-        cells.forEach((cell, index) => {
-            if (cell.textContent === "") {
-                cell.textContent = "O";
-                let score = minimax(cells, 0, false);
-                cell.textContent = "";
-                if (score > bestScore) {
-                    bestScore = score;
-                    move = index;
-                }
-            }
-        });
-
-        if (move !== undefined) {
-            cells[move].textContent = "O";
-            oCells.push(cells[move]);
-            if (oCells.length > 3) {
-                let removed = oCells.shift();
-                removed.textContent = "";
-            }
-            if (checkWinner()) return;
-            turn = "X";
+function checkWinner(){
+    const cells=document.querySelectorAll(".cell");
+    for(let pattern of winPatterns){
+        const [a,b,c]=pattern;
+        if(cells[a].textContent &&
+           cells[a].textContent===cells[b].textContent &&
+           cells[a].textContent===cells[c].textContent){
+            drawWinningLine(pattern);
+            setTimeout(()=>showWinner(cells[a].textContent),1000);
+            return true;
         }
     }
+    return false;
+}
 
-    function minimax(cells, depth, isMaximizing) {
-        let result = checkTerminal(cells);
-        if (result !== null) return result - depth;
+function drawWinningLine(pattern){
+    const board=document.getElementById("board");
+    const cells=document.querySelectorAll(".cell");
+    const rectA=cells[pattern[0]].getBoundingClientRect();
+    const rectC=cells[pattern[2]].getBoundingClientRect();
+    const boardRect=board.getBoundingClientRect();
+    const x1=rectA.left+rectA.width/2-boardRect.left;
+    const y1=rectA.top+rectA.height/2-boardRect.top;
+    const x2=rectC.left+rectC.width/2-boardRect.left;
+    const y2=rectC.top+rectC.height/2-boardRect.top;
+    const line=document.createElement("div");
+    line.classList.add("win-line");
+    line.style.width=Math.hypot(x2-x1,y2-y1)+"px";
+    line.style.transform=`translate(${x1}px,${y1}px) rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;
+    board.appendChild(line);
+}
 
-        if (isMaximizing) {
-            let bestScore = -Infinity;
-            cells.forEach((cell, index) => {
-                if (cell.textContent === "") {
-                    cell.textContent = "O";
-                    let score = minimax(cells, depth + 1, false);
-                    cell.textContent = "";
-                    bestScore = Math.max(score, bestScore);
-                }
-            });
-            return bestScore;
-        } else {
-            let bestScore = Infinity;
-            cells.forEach((cell, index) => {
-                if (cell.textContent === "") {
-                    cell.textContent = "X";
-                    let score = minimax(cells, depth + 1, true);
-                    cell.textContent = "";
-                    bestScore = Math.min(score, bestScore);
-                }
-            });
-            return bestScore;
-        }
-    }
+function showWinner(symbol){
+    gameOver=true;
+    document.getElementById("board").style.visibility="hidden";
+    document.getElementById("winnerText").textContent=`Winner: ${symbol}`;
+    document.getElementById("winnerScreen").style.display="block";
+    document.getElementById("backHome").style.display="none";
+}
 
-    function checkTerminal(cells) {
-        for (let pattern of winPatterns) {
-            const [a, b, c] = pattern;
-            if (cells[a].textContent &&
-                cells[a].textContent === cells[b].textContent &&
-                cells[a].textContent === cells[c].textContent) {
-                return cells[a].textContent === "O" ? 10 : -10;
+function restartGame(){
+    clearBoard();
+    document.getElementById("winnerScreen").style.display="none";
+    document.getElementById("menu").style.display="block";
+}
+
+function goHome(){
+    clearBoard();
+    document.getElementById("menu").style.display="block";
+    document.getElementById("board").style.visibility="hidden";
+    document.getElementById("backHome").style.display="none";
+}
+
+function clearBoard(){
+    document.querySelectorAll(".cell").forEach(c=>c.textContent="");
+    xCells=[]; oCells=[];
+    turn="X"; gameOver=false;
+    document.querySelectorAll(".win-line").forEach(line=>line.remove());
+}
+
+// Immortal Bot with token limit
+function botMove(){
+    if(gameOver) return;
+    const cells=document.querySelectorAll(".cell");
+
+    let bestScore=-Infinity, move;
+    cells.forEach((cell,index)=>{
+        if(cell.textContent===""){
+            cell.textContent="O";
+            let score=minimax(cells,0,false);
+            cell.textContent="";
+            if(score>bestScore){
+                bestScore=score;
+                move=index;
             }
         }
-        if ([...cells].every(c => c.textContent !== "")) {
-            return 0;
-        }
-        return null;
-    }
-
-    function findBestMove(player) {
-        const cells = document.querySelectorAll(".cell");
-        for (let pattern of winPatterns) {
-            const [a, b, c] = pattern;
-            let values = [cells[a].textContent, cells[b].textContent, cells[c].textContent];
-            if (values.filter(v => v === player).length === 2 && values.includes("")) {
-                return pattern[values.indexOf("")];
-            }
-        }
-        return null;
-    }
-
-    document.querySelectorAll(".cell").forEach(cell => {
-        cell.addEventListener("click", () => {
-            if (cell.textContent !== "" || gameOver) return;
-
-            cell.textContent = turn;
-            if (turn === "X") {
-                xCells.push(cell);
-                if (xCells.length > 3) {
-                    let removed = xCells.shift();
-                    removed.textContent = "";
-                }
-                if (checkWinner()) return;
-                turn = "O";
-
-                if (gameMode === "bot") {
-                    setTimeout(botMove, 400);
-                }
-            } else {
-                oCells.push(cell);
-                if (oCells.length > 3) {
-                    let removed = oCells.shift();
-                    removed.textContent = "";
-                }
-                if (checkWinner()) return;
-                turn = "X";
-            }
-        });
     });
+
+    if(move!==undefined){
+        cells[move].textContent="O";
+        oCells.push(cells[move]);
+        if(oCells.length>3){
+            let removed=oCells.shift();
+            removed.textContent="";
+        }
+        if(checkWinner()) return;
+        turn="X";
+    }
+}
+
+function minimax(cells,depth,isMaximizing){
+    let result=checkTerminal(cells);
+    if(result!==null) return result - depth;
+    if(isMaximizing){
+        let bestScore=-Infinity;
+        cells.forEach((cell)=>{
+            if(cell.textContent===""){
+                cell.textContent="O";
+                let score=minimax(cells,depth+1,false);
+                cell.textContent="";
+                bestScore=Math.max(score,bestScore);
+            }
+        });
+        return bestScore;
+    } else{
+        let bestScore=Infinity;
+        cells.forEach((cell)=>{
+            if(cell.textContent===""){
+                cell.textContent="X";
+                let score=minimax(cells,depth+1,true);
+                cell.textContent="";
+                bestScore=Math.min(score,bestScore);
+            }
+        });
+        return bestScore;
+    }
+}
+
+function checkTerminal(cells){
+    for(let pattern of winPatterns){
+        const [a,b,c]=pattern;
+        if(cells[a].textContent &&
+           cells[a].textContent===cells[b].textContent &&
+           cells[a].textContent===cells[c].textContent){
+            return cells[a].textContent==="O"?10:-10;
+        }
+    }
+    if([...cells].every(c=>c.textContent!=="")) return 0;
+    return null;
+}
+
+// Player clicks
+document.querySelectorAll(".cell").forEach(cell=>{
+    cell.addEventListener("click",()=>{
+        if(cell.textContent!==""||gameOver) return;
+        cell.textContent=turn;
+        if(turn==="X"){
+            xCells.push(cell);
+            if(xCells.length>3){ let removed=xCells.shift(); removed.textContent=""; }
+            if(checkWinner()) return;
+            turn="O";
+            if(gameMode==="bot") setTimeout(botMove,400);
+        }else{
+            oCells.push(cell);
+            if(oCells.length>3){ let removed=oCells.shift(); removed.textContent=""; }
+            if(checkWinner()) return;
+            turn="X";
+        }
+    });
+});
 </script>
 
 </body>
