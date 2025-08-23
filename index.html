@@ -19,9 +19,7 @@
         display: none;
     }
     @media (min-width: 1024px) {
-        .side {
-            display: block;
-        }
+        .side { display: block; }
     }
     .center {
         flex: 1;
@@ -44,25 +42,13 @@
         border-radius: 15px;
         position: relative;
     }
-    h1 {
-        margin: 5px 0;
-        font-size: 24px;
-        text-align: center;
-    }
-    a {
-        color: #0ff;
-        text-decoration: none;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
+    h1 { margin: 5px 0; font-size: 24px; text-align: center; }
+    a { color: #0ff; text-decoration: none; font-weight: bold; margin-bottom: 10px; }
     #themeTrigger {
         margin: 4px 0 8px;
-        background:#9c27b0;
-        color:#fff;
-        border:none;
-        padding:8px 12px;
-        border-radius:8px;
-        cursor:pointer;
+        background:#9c27b0; color:#fff;
+        border:none; padding:8px 12px;
+        border-radius:8px; cursor:pointer;
     }
     .big-square {
         background: white;
@@ -88,9 +74,6 @@
         background: #999;
         border-radius: 10px;
         aspect-ratio: 1 / 1;
-        font-size: 2.5em;
-        font-weight: bold;
-        color: white;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -99,13 +82,11 @@
         overflow: hidden;
     }
     .cell img {
-        width: 80%;
-        height: 80%;
-        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-    .menu {
-        text-align: center;
-    }
+    .menu { text-align: center; }
     .menu .mode {
         display: block;
         margin: 15px auto;
@@ -114,34 +95,24 @@
         cursor: pointer;
         border: none;
         transition: 0.3s ease;
-        width: 50vw;
-        height: 20vh;
+        width: 50vw; height: 20vh;
     }
     .menu .mode-2p { background: #64b5f6; color: white; }
     .menu .mode-2p:hover { background-color: #ffb74d; }
     .menu .mode-bot { background: #2196f3; color: white; }
     .menu .mode-bot:hover { background-color: #64b5f6; }
-
     .winner-screen { text-align: center; display: none; }
     .winner-screen h2 { color: black; font-size: 28px; margin-bottom: 15px; }
     .winner-screen button {
-        background: #4caf50;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
+        background: #4caf50; color: white;
+        padding: 10px 20px; border: none;
+        border-radius: 8px; cursor: pointer; font-size: 16px;
     }
     #backHome {
         margin-top: 10px;
-        background: #f44336;
-        color: white;
-        padding: 8px 15px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
+        background: #f44336; color: white;
+        padding: 8px 15px; border: none;
+        border-radius: 8px; cursor: pointer; font-size: 14px;
         display: none;
     }
     .win-line {
@@ -176,9 +147,7 @@
         border-radius: 8px;
         cursor: pointer;
     }
-    #themeOverlay .back-btn {
-        background:#f44336; color:#fff; margin-top: 10px;
-    }
+    #themeOverlay .back-btn { background:#f44336; color:#fff; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -186,7 +155,7 @@
 <div class="center">
     <div class="game-container">
         <h1>Tic Tac Toe</h1>
-        <a href="https://youtube.com/@golutheghost-4444?si=3ny96yTFbFjFtwx4" target="_blank">GOLu the GhosT</a>
+        <a href="#" target="_blank">GOLu the GhosT</a>
         <button id="themeTrigger" onclick="openThemeMenu()">🎭 Theme</button>
         <div class="big-square">
             <div class="board" id="board">
@@ -232,24 +201,24 @@ let tokenImages={
     X: localStorage.getItem("tokenX") || null,
     O: localStorage.getItem("tokenO") || null
 };
+
+// Default funny images for tokens
 const defaultImages={
     X:"1.jpg",
     O:"2.jpg"
 };
+
 const winPatterns=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
 function setMode(m){gameMode=m;menu.style.display="none";board.style.visibility="visible";backHome.style.display="inline-block";}
-function checkWinner(){const c=document.querySelectorAll(".cell");for(let p of winPatterns){let[a,b,d]=p;if(c[a].dataset.symbol&&c[a].dataset.symbol===c[b].dataset.symbol&&c[a].dataset.symbol===c[d].dataset.symbol){drawWinningLine(p);setTimeout(()=>showWinner(c[a].dataset.symbol),1000);return true;}}return false;}
+function checkWinner(){const c=document.querySelectorAll(".cell");for(let p of winPatterns){let[a,b,d]=p;if(c[a].dataset.symbol&&c[a].dataset.symbol===c[b].dataset.symbol&&c[a].dataset.symbol===c[d].dataset.symbol){drawWinningLine(p);setTimeout(()=>showWinner(c[a].dataset.symbol),600);return true;}}return false;}
 function drawWinningLine(p){const b=board,c=document.querySelectorAll(".cell"),ra=c[p[0]].getBoundingClientRect(),rc=c[p[2]].getBoundingClientRect(),rb=b.getBoundingClientRect();const x1=ra.left+ra.width/2-rb.left,y1=ra.top+ra.height/2-rb.top,x2=rc.left+rc.width/2-rb.left,y2=rc.top+rc.height/2-rb.top;let l=document.createElement("div");l.classList.add("win-line");l.style.width=Math.hypot(x2-x1,y2-y1)+"px";l.style.transform=`translate(${x1}px,${y1}px) rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;b.appendChild(l);}
 function showWinner(s){gameOver=true;board.style.visibility="hidden";winnerText.textContent=`Winner: ${s}`;winnerScreen.style.display="block";backHome.style.display="none";}
 function restartGame(){clearBoard();winnerScreen.style.display="none";menu.style.display="block";}
 function goHome(){clearBoard();menu.style.display="block";board.style.visibility="hidden";backHome.style.display="none";closeThemeMenu(true);}
 function clearBoard(){document.querySelectorAll(".cell").forEach(c=>{c.textContent="";c.innerHTML="";c.removeAttribute("data-symbol");});xCells=[];oCells=[];turn="X";gameOver=false;document.querySelectorAll(".win-line").forEach(l=>l.remove());}
 
-function botMove(){if(gameOver)return;const c=document.querySelectorAll(".cell");let best=-Infinity,m; c.forEach((cell,i)=>{if(!cell.dataset.symbol){cell.dataset.symbol="O";let s=minimax(c,0,false);cell.removeAttribute("data-symbol");if(s>best){best=s;m=i;}}});if(m!==undefined){placeSymbol(c[m],"O");oCells.push(c[m]);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}
-function minimax(c,d,isMax){let r=checkTerminal(c);if(r!==null)return r-d;if(isMax){let best=-Infinity;c.forEach(cell=>{if(!cell.dataset.symbol){cell.dataset.symbol="O";let s=minimax(c,d+1,false);cell.removeAttribute("data-symbol");best=Math.max(s,best);}});return best;}else{let best=Infinity;c.forEach(cell=>{if(!cell.dataset.symbol){cell.dataset.symbol="X";let s=minimax(c,d+1,true);cell.removeAttribute("data-symbol");best=Math.min(s,best);}});return best;}}
-function checkTerminal(c){for(let p of winPatterns){let[a,b,d]=p;if(c[a].dataset.symbol&&c[a].dataset.symbol===c[b].dataset.symbol&&c[a].dataset.symbol===c[d].dataset.symbol)return c[a].dataset.symbol==="O"?10:-10;}if([...c].every(x=>x.dataset.symbol))return 0;return null;}
-
+function botMove(){if(gameOver)return;const c=document.querySelectorAll(".cell");let m;for(let i=0;i<c.length;i++){if(!c[i].dataset.symbol){m=i;break;}}if(m!==undefined){placeSymbol(c[m],"O");oCells.push(c[m]);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}
 function placeSymbol(cell,s){let img=document.createElement("img");img.src=tokenImages[s]||defaultImages[s];cell.textContent="";cell.innerHTML="";cell.appendChild(img);cell.dataset.symbol=s;}
 document.querySelectorAll(".cell").forEach(cell=>cell.addEventListener("click",()=>{if(cell.dataset.symbol||gameOver)return;placeSymbol(cell,turn);if(turn==="X"){xCells.push(cell);if(xCells.length>3){let r=xCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="O";if(gameMode==="bot")setTimeout(botMove,400);}else{oCells.push(cell);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}));
 
