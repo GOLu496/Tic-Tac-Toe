@@ -42,6 +42,7 @@
         padding: 10px;
         box-sizing: border-box;
         border-radius: 15px;
+        position: relative;
     }
     h1 {
         margin: 5px 0;
@@ -53,6 +54,15 @@
         text-decoration: none;
         font-weight: bold;
         margin-bottom: 10px;
+    }
+    #themeTrigger {
+        margin: 4px 0 8px;
+        background:#9c27b0;
+        color:#fff;
+        border:none;
+        padding:8px 12px;
+        border-radius:8px;
+        cursor:pointer;
     }
     .big-square {
         background: white;
@@ -86,11 +96,16 @@
         align-items: center;
         cursor: pointer;
         user-select: none;
+        overflow: hidden;
+    }
+    .cell img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
     }
     .menu {
         text-align: center;
     }
-    /* Menu buttons responsive */
     .menu .mode {
         display: block;
         margin: 15px auto;
@@ -99,7 +114,7 @@
         cursor: pointer;
         border: none;
         transition: 0.3s ease;
-        width: 70vw;
+        width: 50vw;
         height: 20vh;
     }
     .menu .mode-2p { background: #64b5f6; color: white; }
@@ -136,16 +151,43 @@
         transform-origin: 0 50%;
         z-index: 10;
     }
+    #themeOverlay {
+        display: none;
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 200;
+    }
+    #themeOverlay .popup {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        width: 80%;
+        max-width: 320px;
+        color: #111;
+    }
+    #themeOverlay button {
+        margin: 6px;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    #themeOverlay .back-btn {
+        background:#f44336; color:#fff; margin-top: 10px;
+    }
 </style>
 </head>
 <body>
-
 <div class="side"></div>
 <div class="center">
     <div class="game-container">
         <h1>Tic Tac Toe</h1>
         <a href="https://youtube.com/@golutheghost-4444?si=3ny96yTFbFjFtwx4" target="_blank">GOLu the GhosT</a>
-
+        <button id="themeTrigger" onclick="openThemeMenu()">🎭 Theme</button>
         <div class="big-square">
             <div class="board" id="board">
                 <div class="cell" data-index="0"></div>
@@ -158,194 +200,62 @@
                 <div class="cell" data-index="7"></div>
                 <div class="cell" data-index="8"></div>
             </div>
-
             <div class="menu" id="menu">
                 <button class="mode mode-2p" onclick="setMode('2p')">2 Players</button>
                 <button class="mode mode-bot" onclick="setMode('bot')">Bot</button>
             </div>
-
             <div class="winner-screen" id="winnerScreen">
                 <h2 id="winnerText"></h2>
                 <button onclick="restartGame()">Restart</button>
             </div>
+            <div id="themeOverlay">
+                <div class="popup">
+                    <h3>Choose Token</h3>
+                    <button onclick="captureImage('X')">Set X Image</button>
+                    <button onclick="captureImage('O')">Set O Image</button>
+                    <br>
+                    <button class="back-btn" onclick="closeThemeMenu()">⬅ Back</button>
+                </div>
+            </div>
         </div>
-
         <button id="backHome" onclick="goHome()">Back to Home</button>
     </div>
 </div>
 <div class="side"></div>
+<video id="camera" autoplay playsinline style="display:none; width:100%; max-height:200px;"></video>
+<canvas id="snapshot" style="display:none;"></canvas>
 
 <script>
-let gameMode = null;
-let turn = "X"; 
-let xCells = [];
-let oCells = [];
-let gameOver = false;
+let gameMode=null, turn="X", xCells=[], oCells=[], gameOver=false;
 
-const winPatterns = [
-    [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,4,7],[2,5,8],
-    [0,4,8],[2,4,6]
-];
+let tokenImages={
+    X: localStorage.getItem("tokenX") || null,
+    O: localStorage.getItem("tokenO") || null
+};
+const defaultImages={
+    X:"1.jpg",
+    O:"2.jpg"
+};
+const winPatterns=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-function setMode(mode){
-    gameMode = mode;
-    document.getElementById("menu").style.display="none";
-    document.getElementById("board").style.visibility="visible";
-    document.getElementById("backHome").style.display="inline-block";
-}
+function setMode(m){gameMode=m;menu.style.display="none";board.style.visibility="visible";backHome.style.display="inline-block";}
+function checkWinner(){const c=document.querySelectorAll(".cell");for(let p of winPatterns){let[a,b,d]=p;if(c[a].dataset.symbol&&c[a].dataset.symbol===c[b].dataset.symbol&&c[a].dataset.symbol===c[d].dataset.symbol){drawWinningLine(p);setTimeout(()=>showWinner(c[a].dataset.symbol),1000);return true;}}return false;}
+function drawWinningLine(p){const b=board,c=document.querySelectorAll(".cell"),ra=c[p[0]].getBoundingClientRect(),rc=c[p[2]].getBoundingClientRect(),rb=b.getBoundingClientRect();const x1=ra.left+ra.width/2-rb.left,y1=ra.top+ra.height/2-rb.top,x2=rc.left+rc.width/2-rb.left,y2=rc.top+rc.height/2-rb.top;let l=document.createElement("div");l.classList.add("win-line");l.style.width=Math.hypot(x2-x1,y2-y1)+"px";l.style.transform=`translate(${x1}px,${y1}px) rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;b.appendChild(l);}
+function showWinner(s){gameOver=true;board.style.visibility="hidden";winnerText.textContent=`Winner: ${s}`;winnerScreen.style.display="block";backHome.style.display="none";}
+function restartGame(){clearBoard();winnerScreen.style.display="none";menu.style.display="block";}
+function goHome(){clearBoard();menu.style.display="block";board.style.visibility="hidden";backHome.style.display="none";closeThemeMenu(true);}
+function clearBoard(){document.querySelectorAll(".cell").forEach(c=>{c.textContent="";c.innerHTML="";c.removeAttribute("data-symbol");});xCells=[];oCells=[];turn="X";gameOver=false;document.querySelectorAll(".win-line").forEach(l=>l.remove());}
 
-function checkWinner(){
-    const cells=document.querySelectorAll(".cell");
-    for(let pattern of winPatterns){
-        const [a,b,c]=pattern;
-        if(cells[a].textContent &&
-           cells[a].textContent===cells[b].textContent &&
-           cells[a].textContent===cells[c].textContent){
-            drawWinningLine(pattern);
-            setTimeout(()=>showWinner(cells[a].textContent),1000);
-            return true;
-        }
-    }
-    return false;
-}
+function botMove(){if(gameOver)return;const c=document.querySelectorAll(".cell");let best=-Infinity,m; c.forEach((cell,i)=>{if(!cell.dataset.symbol){cell.dataset.symbol="O";let s=minimax(c,0,false);cell.removeAttribute("data-symbol");if(s>best){best=s;m=i;}}});if(m!==undefined){placeSymbol(c[m],"O");oCells.push(c[m]);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}
+function minimax(c,d,isMax){let r=checkTerminal(c);if(r!==null)return r-d;if(isMax){let best=-Infinity;c.forEach(cell=>{if(!cell.dataset.symbol){cell.dataset.symbol="O";let s=minimax(c,d+1,false);cell.removeAttribute("data-symbol");best=Math.max(s,best);}});return best;}else{let best=Infinity;c.forEach(cell=>{if(!cell.dataset.symbol){cell.dataset.symbol="X";let s=minimax(c,d+1,true);cell.removeAttribute("data-symbol");best=Math.min(s,best);}});return best;}}
+function checkTerminal(c){for(let p of winPatterns){let[a,b,d]=p;if(c[a].dataset.symbol&&c[a].dataset.symbol===c[b].dataset.symbol&&c[a].dataset.symbol===c[d].dataset.symbol)return c[a].dataset.symbol==="O"?10:-10;}if([...c].every(x=>x.dataset.symbol))return 0;return null;}
 
-function drawWinningLine(pattern){
-    const board=document.getElementById("board");
-    const cells=document.querySelectorAll(".cell");
-    const rectA=cells[pattern[0]].getBoundingClientRect();
-    const rectC=cells[pattern[2]].getBoundingClientRect();
-    const boardRect=board.getBoundingClientRect();
-    const x1=rectA.left+rectA.width/2-boardRect.left;
-    const y1=rectA.top+rectA.height/2-boardRect.top;
-    const x2=rectC.left+rectC.width/2-boardRect.left;
-    const y2=rectC.top+rectC.height/2-boardRect.top;
-    const line=document.createElement("div");
-    line.classList.add("win-line");
-    line.style.width=Math.hypot(x2-x1,y2-y1)+"px";
-    line.style.transform=`translate(${x1}px,${y1}px) rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;
-    board.appendChild(line);
-}
+function placeSymbol(cell,s){let img=document.createElement("img");img.src=tokenImages[s]||defaultImages[s];cell.textContent="";cell.innerHTML="";cell.appendChild(img);cell.dataset.symbol=s;}
+document.querySelectorAll(".cell").forEach(cell=>cell.addEventListener("click",()=>{if(cell.dataset.symbol||gameOver)return;placeSymbol(cell,turn);if(turn==="X"){xCells.push(cell);if(xCells.length>3){let r=xCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="O";if(gameMode==="bot")setTimeout(botMove,400);}else{oCells.push(cell);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}));
 
-function showWinner(symbol){
-    gameOver=true;
-    document.getElementById("board").style.visibility="hidden";
-    document.getElementById("winnerText").textContent=`Winner: ${symbol}`;
-    document.getElementById("winnerScreen").style.display="block";
-    document.getElementById("backHome").style.display="none";
-}
-
-function restartGame(){
-    clearBoard();
-    document.getElementById("winnerScreen").style.display="none";
-    document.getElementById("menu").style.display="block";
-}
-
-function goHome(){
-    clearBoard();
-    document.getElementById("menu").style.display="block";
-    document.getElementById("board").style.visibility="hidden";
-    document.getElementById("backHome").style.display="none";
-}
-
-function clearBoard(){
-    document.querySelectorAll(".cell").forEach(c=>c.textContent="");
-    xCells=[]; oCells=[];
-    turn="X"; gameOver=false;
-    document.querySelectorAll(".win-line").forEach(line=>line.remove());
-}
-
-// Immortal Bot with token limit
-function botMove(){
-    if(gameOver) return;
-    const cells=document.querySelectorAll(".cell");
-
-    let bestScore=-Infinity, move;
-    cells.forEach((cell,index)=>{
-        if(cell.textContent===""){
-            cell.textContent="O";
-            let score=minimax(cells,0,false);
-            cell.textContent="";
-            if(score>bestScore){
-                bestScore=score;
-                move=index;
-            }
-        }
-    });
-
-    if(move!==undefined){
-        cells[move].textContent="O";
-        oCells.push(cells[move]);
-        if(oCells.length>3){
-            let removed=oCells.shift();
-            removed.textContent="";
-        }
-        if(checkWinner()) return;
-        turn="X";
-    }
-}
-
-function minimax(cells,depth,isMaximizing){
-    let result=checkTerminal(cells);
-    if(result!==null) return result - depth;
-    if(isMaximizing){
-        let bestScore=-Infinity;
-        cells.forEach((cell)=>{
-            if(cell.textContent===""){
-                cell.textContent="O";
-                let score=minimax(cells,depth+1,false);
-                cell.textContent="";
-                bestScore=Math.max(score,bestScore);
-            }
-        });
-        return bestScore;
-    } else{
-        let bestScore=Infinity;
-        cells.forEach((cell)=>{
-            if(cell.textContent===""){
-                cell.textContent="X";
-                let score=minimax(cells,depth+1,true);
-                cell.textContent="";
-                bestScore=Math.min(score,bestScore);
-            }
-        });
-        return bestScore;
-    }
-}
-
-function checkTerminal(cells){
-    for(let pattern of winPatterns){
-        const [a,b,c]=pattern;
-        if(cells[a].textContent &&
-           cells[a].textContent===cells[b].textContent &&
-           cells[a].textContent===cells[c].textContent){
-            return cells[a].textContent==="O"?10:-10;
-        }
-    }
-    if([...cells].every(c=>c.textContent!=="")) return 0;
-    return null;
-}
-
-// Player clicks
-document.querySelectorAll(".cell").forEach(cell=>{
-    cell.addEventListener("click",()=>{
-        if(cell.textContent!==""||gameOver) return;
-        cell.textContent=turn;
-        if(turn==="X"){
-            xCells.push(cell);
-            if(xCells.length>3){ let removed=xCells.shift(); removed.textContent=""; }
-            if(checkWinner()) return;
-            turn="O";
-            if(gameMode==="bot") setTimeout(botMove,400);
-        }else{
-            oCells.push(cell);
-            if(oCells.length>3){ let removed=oCells.shift(); removed.textContent=""; }
-            if(checkWinner()) return;
-            turn="X";
-        }
-    });
-});
+function openThemeMenu(){themeOverlay.style.display="flex";}
+function closeThemeMenu(fromHome){themeOverlay.style.display="none";let v=camera;if(v.srcObject&&!fromHome){try{v.srcObject.getTracks().forEach(t=>t.stop());}catch(e){}}v.style.display="none";}
+function captureImage(t){let v=camera;v.style.display="block";navigator.mediaDevices.getUserMedia({video:true}).then(s=>{v.srcObject=s;v.onclick=()=>{let c=snapshot,k=c.getContext("2d");c.width=v.videoWidth;c.height=v.videoHeight;k.drawImage(v,0,0,c.width,c.height);let d=c.toDataURL("image/png");tokenImages[t]=d;localStorage.setItem("token"+t,d);v.srcObject.getTracks().forEach(x=>x.stop());v.style.display="none";closeThemeMenu();};}).catch(e=>alert("Camera denied: "+e));}
 </script>
-
 </body>
 </html>
