@@ -44,12 +44,17 @@
     }
     h1 { margin: 5px 0; font-size: 24px; text-align: center; }
     a { color: #0ff; text-decoration: none; font-weight: bold; margin-bottom: 10px; }
-    #themeTrigger {
+
+       #themeTrigger {
         margin: 4px 0 8px;
-        background:#9c27b0; color:#fff;
-        border:none; padding:8px 12px;
-        border-radius:8px; cursor:pointer;
+        background:#9c27b0;
+        color:#fff;
+        border:none;
+        padding:8px 12px;
+        border-radius:8px;
+        cursor:pointer;
     }
+
     .big-square {
         background: white;
         border-radius: 15px;
@@ -84,8 +89,11 @@
     .cell img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: cover; 
+        display: block;
+        pointer-events: none;
     }
+
     .menu { text-align: center; }
     .menu .mode {
         display: block;
@@ -95,24 +103,34 @@
         cursor: pointer;
         border: none;
         transition: 0.3s ease;
-        width: 50vw; height: 20vh;
+        width: 50vw;
+        height: 20vh;
     }
     .menu .mode-2p { background: #64b5f6; color: white; }
     .menu .mode-2p:hover { background-color: #ffb74d; }
     .menu .mode-bot { background: #2196f3; color: white; }
     .menu .mode-bot:hover { background-color: #64b5f6; }
+
     .winner-screen { text-align: center; display: none; }
     .winner-screen h2 { color: black; font-size: 28px; margin-bottom: 15px; }
     .winner-screen button {
-        background: #4caf50; color: white;
-        padding: 10px 20px; border: none;
-        border-radius: 8px; cursor: pointer; font-size: 16px;
+        background: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
     }
     #backHome {
         margin-top: 10px;
-        background: #f44336; color: white;
-        padding: 8px 15px; border: none;
-        border-radius: 8px; cursor: pointer; font-size: 14px;
+        background: #f44336;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
         display: none;
     }
     .win-line {
@@ -122,7 +140,8 @@
         transform-origin: 0 50%;
         z-index: 10;
     }
-    #themeOverlay {
+
+       #themeOverlay {
         display: none;
         position: absolute;
         inset: 0;
@@ -147,16 +166,21 @@
         border-radius: 8px;
         cursor: pointer;
     }
-    #themeOverlay .back-btn { background:#f44336; color:#fff; margin-top: 10px; }
+    #themeOverlay .back-btn {
+        background:#f44336; color:#fff; margin-top: 10px;
+    }
 </style>
 </head>
 <body>
+
 <div class="side"></div>
 <div class="center">
     <div class="game-container">
         <h1>Tic Tac Toe</h1>
-        <a href="#" target="_blank">GOLu the GhosT</a>
-        <button id="themeTrigger" onclick="openThemeMenu()">🎭 Theme</button>
+        <a href="https://youtube.com/@golutheghost-4444?si=3ny96yTFbFjFtwx4" target="_blank">GOLu the GhosT</a>
+
+          <button id="themeTrigger" onclick="openThemeMenu()">🎭 Theme</button>
+
         <div class="big-square">
             <div class="board" id="board">
                 <div class="cell" data-index="0"></div>
@@ -169,15 +193,18 @@
                 <div class="cell" data-index="7"></div>
                 <div class="cell" data-index="8"></div>
             </div>
+
             <div class="menu" id="menu">
                 <button class="mode mode-2p" onclick="setMode('2p')">2 Players</button>
                 <button class="mode mode-bot" onclick="setMode('bot')">Bot</button>
             </div>
+
             <div class="winner-screen" id="winnerScreen">
                 <h2 id="winnerText"></h2>
                 <button onclick="restartGame()">Restart</button>
             </div>
-            <div id="themeOverlay">
+
+              <div id="themeOverlay">
                 <div class="popup">
                     <h3>Choose Token</h3>
                     <button onclick="captureImage('X')">Set X Image</button>
@@ -187,44 +214,307 @@
                 </div>
             </div>
         </div>
+
         <button id="backHome" onclick="goHome()">Back to Home</button>
     </div>
 </div>
 <div class="side"></div>
+
 <video id="camera" autoplay playsinline style="display:none; width:100%; max-height:200px;"></video>
 <canvas id="snapshot" style="display:none;"></canvas>
 
 <script>
-let gameMode=null, turn="X", xCells=[], oCells=[], gameOver=false;
+let gameMode = null;
+let turn = "X";
+let gameOver = false;
 
-let tokenImages={
-    X: localStorage.getItem("tokenX") || null,
-    O: localStorage.getItem("tokenO") || null
+let xOrder = [];
+let oOrder = [];
+
+let tokenImages = {
+  X: localStorage.getItem("tokenX") || null,
+  O: localStorage.getItem("tokenO") || null
+};
+const defaultImages = {
+  X: "data:image/svg+xml;utf8,<svg xmlns='1.jpg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2323c552'/><circle cx='35' cy='40' r='12' fill='white'/><circle cx='65' cy='40' r='12' fill='white'/><circle cx='35' cy='40' r='5'/><circle cx='65' cy='40' r='5'/><rect x='28' y='62' width='44' height='10' rx='5' fill='black'/></svg>",
+  O: "data:image/svg+xml;utf8,<svg xmlns='2.jpg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%235a67d8'/><rect x='20' y='25' width='60' height='50' rx='10' fill='white'/><circle cx='40' cy='45' r='7' fill='%235a67d8'/><circle cx='60' cy='45' r='7' fill='%235a67d8'/><rect x='35' y='62' width='30' height='8' rx='4' fill='%235a67d8'/></svg>"
 };
 
-// Default funny images for tokens
-const defaultImages={
-    X:"1.jpg",
-    O:"2.jpg"
-};
+const winPatterns = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
 
-const winPatterns=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function setMode(mode){
+  gameMode = mode;
+  document.getElementById("menu").style.display="none";
+  document.getElementById("board").style.visibility="visible";
+  document.getElementById("backHome").style.display="inline-block";
+}
+function showWinner(symbol){
+  gameOver = true;
+  document.getElementById("board").style.visibility="hidden";
+  document.getElementById("winnerText").textContent = `Winner: ${symbol}`;
+  document.getElementById("winnerScreen").style.display = "block";
+  document.getElementById("backHome").style.display = "none";
+}
+function restartGame(){
+  clearBoard();
+  document.getElementById("winnerScreen").style.display="none";
+  document.getElementById("menu").style.display="block";
+}
+function goHome(){
+  clearBoard();
+  document.getElementById("menu").style.display="block";
+  document.getElementById("board").style.visibility="hidden";
+  document.getElementById("backHome").style.display="none";
+  closeThemeMenu(true);
+}
+function clearBoard(){
+  document.querySelectorAll(".cell").forEach(c=>{
+    c.innerHTML="";
+    c.removeAttribute("data-symbol");
+  });
+  xOrder = [];
+  oOrder = [];
+  turn="X";
+  gameOver=false;
+  document.querySelectorAll(".win-line").forEach(line=>line.remove());
+}
+    
+function drawWinningLine(pattern){
+  const board = document.getElementById("board");
+  const cells = document.querySelectorAll(".cell");
+  const rectA = cells[pattern[0]].getBoundingClientRect();
+  const rectC = cells[pattern[2]].getBoundingClientRect();
+  const boardRect = board.getBoundingClientRect();
+  const x1 = rectA.left + rectA.width/2 - boardRect.left;
+  const y1 = rectA.top  + rectA.height/2 - boardRect.top;
+  const x2 = rectC.left + rectC.width/2 - boardRect.left;
+  const y2 = rectC.top  + rectC.height/2 - boardRect.top;
+  const line = document.createElement("div");
+  line.classList.add("win-line");
+  line.style.width = Math.hypot(x2-x1, y2-y1) + "px";
+  line.style.transform = `translate(${x1}px,${y1}px) rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;
+  board.appendChild(line);
+}
+function checkWinnerFromBoardArr(arr){
+  for(const p of winPatterns){
+    const [a,b,c]=p;
+    if(arr[a] && arr[a]===arr[b] && arr[a]===arr[c]) return arr[a];
+  }
+  return null;
+}
+function getBoardArr(){
+  return [...document.querySelectorAll(".cell")].map(c=>c.dataset.symbol||null);
+}
+function checkWinnerUI(){
+  const winner = checkWinnerFromBoardArr(getBoardArr());
+  if(winner){
+    const pattern = winPatterns.find(p => p.every(i => getBoardArr()[i]===winner));
+    if(pattern) drawWinningLine(pattern);
+    setTimeout(()=>showWinner(winner), 600);
+    return true;
+  }
+  return false;
+}
 
-function setMode(m){gameMode=m;menu.style.display="none";board.style.visibility="visible";backHome.style.display="inline-block";}
-function checkWinner(){const c=document.querySelectorAll(".cell");for(let p of winPatterns){let[a,b,d]=p;if(c[a].dataset.symbol&&c[a].dataset.symbol===c[b].dataset.symbol&&c[a].dataset.symbol===c[d].dataset.symbol){drawWinningLine(p);setTimeout(()=>showWinner(c[a].dataset.symbol),600);return true;}}return false;}
-function drawWinningLine(p){const b=board,c=document.querySelectorAll(".cell"),ra=c[p[0]].getBoundingClientRect(),rc=c[p[2]].getBoundingClientRect(),rb=b.getBoundingClientRect();const x1=ra.left+ra.width/2-rb.left,y1=ra.top+ra.height/2-rb.top,x2=rc.left+rc.width/2-rb.left,y2=rc.top+rc.height/2-rb.top;let l=document.createElement("div");l.classList.add("win-line");l.style.width=Math.hypot(x2-x1,y2-y1)+"px";l.style.transform=`translate(${x1}px,${y1}px) rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;b.appendChild(l);}
-function showWinner(s){gameOver=true;board.style.visibility="hidden";winnerText.textContent=`Winner: ${s}`;winnerScreen.style.display="block";backHome.style.display="none";}
-function restartGame(){clearBoard();winnerScreen.style.display="none";menu.style.display="block";}
-function goHome(){clearBoard();menu.style.display="block";board.style.visibility="hidden";backHome.style.display="none";closeThemeMenu(true);}
-function clearBoard(){document.querySelectorAll(".cell").forEach(c=>{c.textContent="";c.innerHTML="";c.removeAttribute("data-symbol");});xCells=[];oCells=[];turn="X";gameOver=false;document.querySelectorAll(".win-line").forEach(l=>l.remove());}
+function placeSymbol(cell, symbol){
+  const idx = +cell.getAttribute("data-index");
+  if(cell.dataset.symbol) return false; 
+    const img = document.createElement("img");
+  img.src = tokenImages[symbol] || defaultImages[symbol];
+  cell.innerHTML = "";
+  cell.appendChild(img);
+  cell.dataset.symbol = symbol;
 
-function botMove(){if(gameOver)return;const c=document.querySelectorAll(".cell");let m;for(let i=0;i<c.length;i++){if(!c[i].dataset.symbol){m=i;break;}}if(m!==undefined){placeSymbol(c[m],"O");oCells.push(c[m]);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}
-function placeSymbol(cell,s){let img=document.createElement("img");img.src=tokenImages[s]||defaultImages[s];cell.textContent="";cell.innerHTML="";cell.appendChild(img);cell.dataset.symbol=s;}
-document.querySelectorAll(".cell").forEach(cell=>cell.addEventListener("click",()=>{if(cell.dataset.symbol||gameOver)return;placeSymbol(cell,turn);if(turn==="X"){xCells.push(cell);if(xCells.length>3){let r=xCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="O";if(gameMode==="bot")setTimeout(botMove,400);}else{oCells.push(cell);if(oCells.length>3){let r=oCells.shift();r.textContent="";r.innerHTML="";r.removeAttribute("data-symbol");}if(checkWinner())return;turn="X";}}));
+    if(symbol==="X"){
+    xOrder.push(idx);
+    if(xOrder.length>3){
+      const rem = xOrder.shift();
+      const rc = document.querySelector(`.cell[data-index="${rem}"]`);
+      if(rc){ rc.innerHTML=""; rc.removeAttribute("data-symbol"); }
+    }
+  } else {
+    oOrder.push(idx);
+    if(oOrder.length>3){
+      const rem = oOrder.shift();
+      const rc = document.querySelector(`.cell[data-index="${rem}"]`);
+      if(rc){ rc.innerHTML=""; rc.removeAttribute("data-symbol"); }
+    }
+  }
+  return true;
+}
+document.querySelectorAll(".cell").forEach(cell=>{
+  cell.addEventListener("click",()=>{
+    if(gameOver) return;
+    if(!placeSymbol(cell, turn)) return;
 
-function openThemeMenu(){themeOverlay.style.display="flex";}
-function closeThemeMenu(fromHome){themeOverlay.style.display="none";let v=camera;if(v.srcObject&&!fromHome){try{v.srcObject.getTracks().forEach(t=>t.stop());}catch(e){}}v.style.display="none";}
-function captureImage(t){let v=camera;v.style.display="block";navigator.mediaDevices.getUserMedia({video:true}).then(s=>{v.srcObject=s;v.onclick=()=>{let c=snapshot,k=c.getContext("2d");c.width=v.videoWidth;c.height=v.videoHeight;k.drawImage(v,0,0,c.width,c.height);let d=c.toDataURL("image/png");tokenImages[t]=d;localStorage.setItem("token"+t,d);v.srcObject.getTracks().forEach(x=>x.stop());v.style.display="none";closeThemeMenu();};}).catch(e=>alert("Camera denied: "+e));}
+    if(checkWinnerUI()) return;
+
+    if(gameMode==="bot" && turn==="X"){
+      turn="O";
+      setTimeout(botMove, 250);
+    } else {
+      turn = (turn==="X") ? "O" : "X";
+    }
+  });
+});
+const MAX_DEPTH = 10;  
+
+function botMove(){
+  if(gameOver) return;
+
+  const state = readState();
+  let bestScore = -Infinity;
+  let bestIdx = null;
+
+  const legal = legalPlacements(state, "O");
+  for(const idx of legal){
+    const next = applyPlacement(state, idx, "O");
+    const score = minimax(next, 1, -Infinity, Infinity, false);
+    if(score > bestScore){ bestScore = score; bestIdx = idx; }
+  }
+
+  if(bestIdx !== null){
+    const cell = document.querySelector(`.cell[data-index="${bestIdx}"]`);
+    placeSymbol(cell, "O");
+    if(checkWinnerUI()) return;
+    turn = "X";
+  }
+}
+function readState(){
+  const board = getBoardArr(); 
+  return {
+    board,
+    xOrder: [...xOrder],
+    oOrder: [...oOrder]
+  };
+}
+
+function legalPlacements(state, who){
+  const res=[];
+  for(let i=0;i<9;i++) if(state.board[i]==null) res.push(i);
+  return res;
+}
+
+function applyPlacement(state, idx, who){
+  const board = state.board.slice();
+  const xQ = state.xOrder.slice();
+  const oQ = state.oOrder.slice();
+
+  if(board[idx]!=null) return state; 
+  board[idx]=who;
+  if(who==="X"){
+    xQ.push(idx);
+    if(xQ.length>3){
+      const rem = xQ.shift();
+      board[rem]=null;
+    }
+  } else {
+    oQ.push(idx);
+    if(oQ.length>3){
+      const rem = oQ.shift();
+      board[rem]=null;
+    }
+  }
+  return {board, xOrder:xQ, oOrder:oQ};
+}
+
+function terminalScore(board, depth){
+  const w = checkWinnerFromBoardArr(board);
+  if(w==="O") return 100 - depth; 
+  if(w==="X") return depth - 100; 
+  return null;
+}
+function heuristic(board){
+  let score=0;
+  for(const p of winPatterns){
+    const [a,b,c]=p;
+    const line=[board[a],board[b],board[c]];
+    const o = line.filter(v=>v==="O").length;
+    const x = line.filter(v=>v==="X").length;
+    const e = 3-o-x;
+    if(o>0 && x>0) continue;
+    if(o===2 && e===1) score += 6;
+    else if(o===1 && e===2) score += 2;
+    else if(x===2 && e===1) score -= 6;
+    else if(x===1 && e===2) score -= 2;
+  }
+  if(board[4]==="O") score += 1; else if(board[4]==="X") score -= 1;
+  [0,2,6,8].forEach(i=>{
+    if(board[i]==="O") score += 0.5;
+    else if(board[i]==="X") score -= 0.5;
+  });
+  return score;
+}
+
+function minimax(state, depth, alpha, beta, maximizing){
+  const term = terminalScore(state.board, depth);
+  if(term!==null) return term;
+  if(depth>=MAX_DEPTH) return heuristic(state.board);
+
+  if(maximizing){
+    let best = -Infinity;
+    const moves = legalPlacements(state, "O");
+    for(const idx of moves){
+      const next = applyPlacement(state, idx, "O");
+      const val = minimax(next, depth+1, alpha, beta, false);
+      best = Math.max(best, val);
+      alpha = Math.max(alpha, val);
+      if(beta <= alpha) break;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    const moves = legalPlacements(state, "X");
+    for(const idx of moves){
+      const next = applyPlacement(state, idx, "X");
+      const val = minimax(next, depth+1, alpha, beta, true);
+      best = Math.min(best, val);
+      beta = Math.min(beta, val);
+      if(beta <= alpha) break;
+    }
+    return best;
+  }
+}
+function openThemeMenu(){
+  document.getElementById("themeOverlay").style.display = "flex";
+}
+function closeThemeMenu(fromHome){
+  const overlay = document.getElementById("themeOverlay");
+  overlay.style.display = "none";
+  const video = document.getElementById("camera");
+  if (video.srcObject && !fromHome){
+    try { video.srcObject.getTracks().forEach(t=>t.stop()); } catch(e){}
+  }
+  video.style.display = "none";
+}
+
+function captureImage(token){
+  const video = document.getElementById("camera");
+  video.style.display = "block";
+  navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+      video.srcObject = stream;
+      video.onclick = () => {
+          const canvas = document.getElementById("snapshot");
+          const ctx = canvas.getContext("2d");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataURL = canvas.toDataURL("image/png");
+          tokenImages[token] = dataURL;
+          localStorage.setItem("token"+token, dataURL);
+         video.srcObject.getTracks().forEach(t => t.stop());
+          video.style.display = "none";
+          closeThemeMenu();
+      };
+  })
+  .catch(err => alert("Camera access denied: " + err));
+}
 </script>
+
 </body>
 </html>
